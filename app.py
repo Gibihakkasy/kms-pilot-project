@@ -1,14 +1,27 @@
 import gradio as gr
+import os
+import threading
+import atexit
 from qa.retriever import Retriever
 from qa.answer_generator import AnswerGenerator
 from utils.language_detect import detect_language
+from utils.file_monitor import DocumentMonitor
+from embeddings.vector_store import create_and_save_vector_store
 
-# --- INITIALIZATION ---
-# Load the retriever and answer generator once to be reused across requests
+# --- CONFIGURATION & INITIALIZATION ---
+DOCUMENTS_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'documents')
+
+# Load the retriever and answer generator once
 print("Initializing the KMS system...")
 retriever = Retriever()
 answer_generator = AnswerGenerator()
 print("KMS system initialized successfully.")
+
+# Initialize the document monitor
+monitor = DocumentMonitor(path=DOCUMENTS_DIR, callback=create_and_save_vector_store)
+
+# Register a cleanup function to stop the monitor on exit
+atexit.register(monitor.stop)
 
 # --- CORE FUNCTION ---
 def get_answer(query: str):
@@ -81,5 +94,15 @@ with gr.Blocks(theme=gr.themes.Soft(), title="AI-Powered KMS") as demo:  # type:
 
 # --- LAUNCH THE APP ---
 if __name__ == "__main__":
+    # First, ensure the vector store exists before launching the app
+    if not os.path.exists(retriever.index_path) or not os.path.exists(retriever.metadata_path):
+        print("Vector store not found. Running initial indexing...")
+        create_and_save_vector_store()
+        print("Initial indexing complete.")
+
+    # Start the file monitor in a background thread
+    monitor_thread = threading.Thread(target=monitor.start, daemon=True)
+    monitor_thread.start()
+
     print("Launching Gradio interface...")
     demo.launch()

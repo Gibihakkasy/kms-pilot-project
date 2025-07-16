@@ -23,10 +23,12 @@ class Retriever:
         if not self.api_key:
             raise ValueError("OPENAI_API_KEY environment variable not set.")
         self.client = OpenAI(api_key=self.api_key)
+        self.index_path = FAISS_INDEX_PATH
+        self.metadata_path = METADATA_PATH
         
         try:
-            self.index = faiss.read_index(FAISS_INDEX_PATH)
-            with open(METADATA_PATH, 'r') as f:
+            self.index = faiss.read_index(self.index_path)
+            with open(self.metadata_path, 'r') as f:
                 self.metadata = json.load(f)
             print("Retriever initialized successfully.")
         except Exception as e:

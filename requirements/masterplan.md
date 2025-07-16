@@ -1,14 +1,14 @@
-
 ## AI-Powered Knowledge Management System (KMS) Pilot – Masterplan
 
 ### Objective
-Build a local prototype to demonstrate AI-powered semantic search and question-answering over PDF-based internal policies and SOPs. The pilot will run for 1 week, targeting internal usage by a single user with minimal technical setup.
+Build a local prototype to demonstrate AI-powered semantic search and question-answering over PDF-based OJK regulatory documents. The pilot will run for 1 week, targeting internal usage by a single user with minimal technical setup. The system will monitor a folder for new or updated PDFs and automatically reprocess them. It will also support a conversational assistant-style interface for more natural interaction.
 
 ### Target Outcome
 - Semantic search capability over local PDFs (English and Indonesian)
 - Natural language QA with source reference (file name and page number)
-- Simple Gradio web interface
+- Assistant-style Gradio web interface with conversational history
 - End-to-end offline-compatible setup with OpenAI API
+- Automatic document refresh and vector index updates when files change
 
 ### Scope
 
@@ -16,24 +16,26 @@ Build a local prototype to demonstrate AI-powered semantic search and question-a
 - Local ingestion of PDF files from a folder
 - Chunking, embedding, and indexing documents using OpenAI
 - Semantic retrieval and LLM-based answering with citation
-- Gradio UI for upload + query interface
+- Gradio UI for assistant-style conversational interface
 - Multilingual support (English & Indonesian)
 - Local vector database (FAISS)
+- Automatic detection and reprocessing of new or modified PDFs
 
 #### Out of Scope
 - Access control / user authentication
 - Real-time collaboration or document editing
 - Integration with enterprise systems (e.g. SharePoint, GDrive)
-- Automatic document refresh or update monitoring
 
 ### Tools & Tech Stack
 
 | Layer                     | Tool / Stack                                |
 |---------------------------|---------------------------------------------|
 | UI                        | Gradio (local web interface)                |
+| Chat Interaction Framework| Gradio ChatInterface / Gradio Blocks        |
 | PDF Parser                | PyMuPDF or pdfplumber                       |
 | Embedding                 | OpenAI `text-embedding-3-large`             |
 | Vector Store              | FAISS (lightweight, local)                  |
+| File Monitoring           | watchdog                                    |
 | LLM for QA                | OpenAI GPT-4                                |
 | Language Detection        | langdetect or fasttext                      |
 | Programming Language      | Python 3.10+                                |
@@ -78,6 +80,15 @@ kms_pilot/
 
 6. Polish UI, add README, validate edge cases  
   - Final refinement, document usage, and handle edge/corner cases
+
+7. Implement automatic document monitoring and re-indexing  
+  - Use `watchdog` to monitor the `/documents` folder  
+  - On detection of a new or modified file, re-trigger ingestion, chunking, embedding, and vector indexing  
+
+8. Upgrade UI to assistant-style chat interaction  
+  - Replace single-turn query UI with persistent chat history  
+  - Display back-and-forth conversation context  
+  - Support conversational context handling for follow-up questions
 
 ### Success Criteria
 
