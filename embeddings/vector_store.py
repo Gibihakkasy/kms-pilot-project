@@ -1,0 +1,87 @@
+import os
+import json
+import numpy as np
+import faiss
+from openai import OpenAI
+import sys
+from dotenv import load_dotenv
+
+# Load environment variables from .env
+load_dotenv()
+
+
+# Add project root to the Python path
+project_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+sys.path.append(project_root)
+
+from ingest.pdf_loader import load_and_chunk_pdfs
+
+# --- Configuration ---
+EMBEDDING_MODEL = "text-embedding-3-large"
+FAISS_INDEX_PATH = os.path.join(project_root, 'embeddings', 'index.faiss')
+METADATA_PATH = os.path.join(project_root, 'embeddings', 'metadata.json')
+DOCUMENTS_DIR = os.path.join(project_root, 'documents')
+
+def get_openai_client():
+    """Initializes and returns the OpenAI client, checking for API key."""
+    api_key = os.getenv("OPENAI_API_KEY")
+    if not api_key:
+        raise ValueError("OPENAI_API_KEY environment variable not set.")
+    return OpenAI(api_key=api_key)
+
+def embed_chunks(chunks):
+    """Generates embeddings for a list of text chunks using OpenAI."""
+    client = get_openai_client()
+    texts = [chunk['text'] for chunk in chunks]
+    
+    try:
+        response = client.embeddings.create(input=texts, model=EMBEDDING_MODEL)
+        embeddings = [item.embedding for item in response.data]
+        return np.array(embeddings, dtype='float32')
+    except Exception as e:
+        print(f"An error occurred while generating embeddings: {e}")
+        return None
+
+def create_and_save_vector_store():
+    """
+    Loads PDF chunks, generates embeddings, and saves them to a FAISS index.
+    """
+    print("Loading and chunking PDFs...")
+    chunks = load_and_chunk_pdfs(DOCUMENTS_DIR)
+    if not chunks:
+        print("No chunks were loaded. Aborting.")
+        return
+
+    print(f"Generating embeddings for {len(chunks)} chunks...")
+    embeddings = embed_chunks(chunks)
+    if embeddings is None:
+        print("Failed to generate embeddings. Aborting.")
+        return
+
+    # Create a FAISS index
+    dimension = embeddings.shape[1]
+    index = faiss.IndexFlatL2(dimension)
+    index = faiss.IndexIDMap(index)
+
+    # Add vectors to the index with their original indices as IDs
+    ids = np.arange(len(chunks))
+    index.add_with_ids(embeddings, ids) # type: ignore
+
+    print(f"Saving FAISS index to {FAISS_INDEX_PATH}")
+    faiss.write_index(index, FAISS_INDEX_PATH)
+
+    # Save metadata
+    # Save metadata, now including the text for context
+    metadata = {str(i): chunk for i, chunk in enumerate(chunks)}
+    print(f"Saving metadata to {METADATA_PATH}")
+    with open(METADATA_PATH, 'w') as f:
+        json.dump(metadata, f, indent=4)
+
+    print("\nVector store created successfully!")
+    print(f"- FAISS index saved at: {FAISS_INDEX_PATH}")
+    print(f"- Metadata saved at: {METADATA_PATH}")
+
+if __name__ == '__main__':
+    # Make sure to set your OPENAI_API_KEY environment variable before running
+    # Example: export OPENAI_API_KEY='your_key_here'
+    create_and_save_vector_store()
