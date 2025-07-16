@@ -15,7 +15,7 @@ load_dotenv()
 class AnswerGenerator:
     """Generates answers using an LLM based on a query and retrieved context."""
 
-    def __init__(self, model: str = "gpt-3.5-turbo"):
+    def __init__(self, model: str = "gpt-4.1-nano"):
         """Initializes the AnswerGenerator with an OpenAI client."""
         self.client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
         self.model = model

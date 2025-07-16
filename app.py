@@ -94,9 +94,27 @@ with gr.Blocks(theme=gr.themes.Soft(), title="AI-Powered KMS") as demo:  # type:
 
 # --- LAUNCH THE APP ---
 if __name__ == "__main__":
-    # First, ensure the vector store exists before launching the app
+    # Smarter startup check: ensure all PDFs are embedded
+    need_reindex = False
     if not os.path.exists(retriever.index_path) or not os.path.exists(retriever.metadata_path):
         print("Vector store not found. Running initial indexing...")
+        need_reindex = True
+    else:
+        # Check if any PDF in documents/ is missing from metadata.json
+        import json
+        pdf_files = set([f for f in os.listdir(DOCUMENTS_DIR) if f.lower().endswith('.pdf')])
+        try:
+            with open(retriever.metadata_path, 'r') as f:
+                metadata = json.load(f)
+            embedded_files = set(chunk['metadata']['file_name'] for chunk in metadata.values())
+            missing_pdfs = pdf_files - embedded_files
+            if missing_pdfs:
+                print(f"Detected new PDFs not yet embedded: {missing_pdfs}. Running re-indexing...")
+                need_reindex = True
+        except Exception as e:
+            print(f"Error reading metadata for startup check: {e}")
+            need_reindex = True
+    if need_reindex:
         create_and_save_vector_store()
         print("Initial indexing complete.")
 

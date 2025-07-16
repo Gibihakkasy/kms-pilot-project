@@ -30,17 +30,58 @@ def get_openai_client():
     return OpenAI(api_key=api_key)
 
 def embed_chunks(chunks):
-    """Generates embeddings for a list of text chunks using OpenAI."""
+    """
+    Generates embeddings for a list of text chunks using OpenAI, batching requests to stay under the 300,000 token limit using tiktoken for accurate counting.
+    """
+    import tiktoken
     client = get_openai_client()
     texts = [chunk['text'] for chunk in chunks]
-    
+    max_tokens_per_request = 300000
+
+    # Use tiktoken for the OpenAI embedding model
     try:
-        response = client.embeddings.create(input=texts, model=EMBEDDING_MODEL)
-        embeddings = [item.embedding for item in response.data]
-        return np.array(embeddings, dtype='float32')
+        encoding = tiktoken.encoding_for_model(EMBEDDING_MODEL)
+    except Exception:
+        encoding = tiktoken.get_encoding("cl100k_base")
+
+    def count_tokens(text):
+        return len(encoding.encode(text))
+
+    batches = []
+    current_batch = []
+    current_tokens = 0
+    for text in texts:
+        tokens = count_tokens(text)
+        if tokens > max_tokens_per_request:
+            print(f"Warning: A single chunk exceeds the max token limit and will be processed alone (length: {tokens} tokens).")
+            if current_batch:
+                batches.append(current_batch)
+                current_batch = []
+                current_tokens = 0
+            batches.append([text])
+            continue
+        if current_tokens + tokens > max_tokens_per_request:
+            if current_batch:
+                batches.append(current_batch)
+            current_batch = [text]
+            current_tokens = tokens
+        else:
+            current_batch.append(text)
+            current_tokens += tokens
+    if current_batch:
+        batches.append(current_batch)
+
+    all_embeddings = []
+    try:
+        for i, batch in enumerate(batches):
+            print(f"Requesting embeddings for batch {i+1}/{len(batches)} (batch size: {len(batch)})...")
+            response = client.embeddings.create(input=batch, model=EMBEDDING_MODEL)
+            all_embeddings.extend([item.embedding for item in response.data])
+        return np.array(all_embeddings, dtype='float32')
     except Exception as e:
         print(f"An error occurred while generating embeddings: {e}")
         return None
+
 
 def create_and_save_vector_store():
     """
