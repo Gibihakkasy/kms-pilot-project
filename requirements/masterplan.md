@@ -85,10 +85,10 @@ kms_pilot/
   - Use `watchdog` to monitor the `/documents` folder  
   - On detection of a new or modified file, re-trigger ingestion, chunking, embedding, and vector indexing  
 
-8. Upgrade UI to assistant-style chat interaction  
-  - Replace single-turn query UI with persistent chat history  
-  - Display back-and-forth conversation context  
-  - Support conversational context handling for follow-up questions
+8. Refactor ingestion using LangChain  
+  - Replace manual PDF reading with PyMuPDFLoader  
+  - Use RecursiveCharacterTextSplitter for chunking  
+  - Attach metadata to each chunk
 
 ### Success Criteria
 

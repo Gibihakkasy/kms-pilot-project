@@ -43,7 +43,7 @@ class AnswerGenerator:
         You are a helpful assistant for a Knowledge Management System.
         Answer the user's question based *only* on the provided context below.
         If the context does not contain the answer, state that you cannot answer the question with the given information.
-        Provide the answer in the same language as the user's question.
+        Provide the answer in the same language as the user's question, if not sure what language default back to English.
 
         User Question: {query}
 

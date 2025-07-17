@@ -4,3 +4,4 @@ openai
 gradio
 langdetect
 tiktoken
+langchain
