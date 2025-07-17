@@ -5,3 +5,4 @@ gradio
 langdetect
 tiktoken
 langchain
+sentence-transformers

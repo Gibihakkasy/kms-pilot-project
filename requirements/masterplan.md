@@ -90,6 +90,12 @@ kms_pilot/
   - Use RecursiveCharacterTextSplitter for chunking  
   - Attach metadata to each chunk
 
+9. Refactor Embedding and Vector Store
+  - Use HuggingFaceEmbeddings or OpenAIEmbeddings
+  - Vectorize chunks and store with FAISS
+  - Persist to and load from embeddings/faiss_index/
+  - Use normalized vectors (important for BGE)
+
 ### Success Criteria
 
 - Documents can be uploaded or placed in a folder
