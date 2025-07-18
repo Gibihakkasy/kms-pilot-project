@@ -96,6 +96,12 @@ kms_pilot/
   - Persist to and load from embeddings/faiss_index/
   - Use normalized vectors (important for BGE)
 
+10. Refactor summarization using chat model
+  - Diagnose failure of previous approach using completion model
+  - Switch to ChatOpenAI (e.g., gpt-4.1) with refine/stuff chain
+  - Inject better prompts and test on BI regulations
+
+
 ### Success Criteria
 
 - Documents can be uploaded or placed in a folder
