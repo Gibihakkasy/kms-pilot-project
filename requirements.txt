@@ -4,5 +4,7 @@ openai
 gradio
 langdetect
 tiktoken
+langgraph
 langchain
 sentence-transformers
+watchdog

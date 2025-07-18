@@ -55,6 +55,7 @@ langchain
   - Bullet points grouped under expected labels
   - No hallucination (e.g., about metadata like signature)
   - Real legal content extraction (titles, responsibilities, penalties)
+- From the project root: python tests/run_summarizer.py --file documents/Peraturan\ BI\ No.\ 3-10-PBI-2001.pdf
 
 - Edge cases:
   - Empty document list

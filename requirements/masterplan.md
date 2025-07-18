@@ -101,6 +101,11 @@ kms_pilot/
   - Switch to ChatOpenAI (e.g., gpt-4.1) with refine/stuff chain
   - Inject better prompts and test on BI regulations
 
+11. Build LangGraph-based assistant flow with advanced session memory
+  - Route queries to QA or summarization based on intent
+  - Maintain multi-turn context: remember last 5 Q&A pairs
+  - If conversation exceeds 5 Q&A, summarize older turns using GPT-4.1-nano and include the summary as part of the context
+  - Enable follow-up questions and long-session continuity within a session
 
 ### Success Criteria
 
