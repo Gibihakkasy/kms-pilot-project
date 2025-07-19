@@ -4,6 +4,7 @@ from typing import List, Dict, Any
 
 from dotenv import load_dotenv
 from openai import OpenAI
+import tiktoken
 
 # Add the project root to the Python path to allow for package-like imports
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
@@ -20,7 +21,7 @@ class AnswerGenerator:
         self.client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
         self.model = model
 
-    def generate_answer(self, query: str, chunks: List[Dict[str, Any]]) -> str:
+    def generate_answer(self, query: str, chunks: List[Dict[str, Any]], previous_questions: str = "", summarized_history: str = "") -> str:
         """
         Generates an answer by synthesizing information from retrieved chunks.
 
@@ -28,6 +29,8 @@ class AnswerGenerator:
             query: The user's question.
             chunks: A list of dictionaries, where each dictionary is a retrieved chunk
                     containing text and metadata.
+            previous_questions: (Optional) String of previous Q&A pairs to include in the prompt.
+            summarized_history: (Optional) Summarized history string to include in the prompt.
 
         Returns:
             A string containing the generated answer.
@@ -38,22 +41,37 @@ class AnswerGenerator:
         # Combine the text from all chunks to form the context
         context = "\n\n---\n\n".join([chunk['text'] for chunk in chunks])
 
-        # Create the prompt for the LLM
-        prompt = f"""
-        You are a helpful assistant for a Knowledge Management System.
-        Answer the user's question based *only* on the provided context below.
-        If the context does not contain the answer, state that you cannot answer the question with the given information.
-        Provide the answer in the same language as the user's question, if not sure what language default back to English.
-        Format the answer for readability, e.g. use bullet points, numbered lists, etc.
+        # Build prompt sections
+        prompt_sections = []
+        previous_questions = previous_questions or ""
+        summarized_history = summarized_history or ""
+        if summarized_history:
+            prompt_sections.append(f"Summarized Conversation:\n{summarized_history}")
+        if previous_questions:
+            prompt_sections.append(f"Previous Q&A:\n{previous_questions}")
+        prompt_sections.append(f"Vector Search Result:\n{context}")
+        prompt_sections.append(f"User Question:\n{query}")
+        prompt = "\n\n====\n\n".join(prompt_sections) + "\n\nAnswer:"
 
-        User Question: {query}
-
-        Context:
-        ---
-        {context}
-        ---
-        Answer:
-        """
+        # Token counting
+        try:
+            encoding = tiktoken.encoding_for_model(self.model)
+        except Exception:
+            encoding = tiktoken.get_encoding("cl100k_base")
+        prompt_tokens = len(encoding.encode(prompt))
+        # Estimate cost (for GPT-4.1-nano, adjust as needed)
+        # Example: $10.00 / 1M tokens (input)
+        cost_per_1k = 0.01  # $0.01 per 1K tokens (adjust to your model pricing)
+        cost = (prompt_tokens / 1000) * cost_per_1k
+        # Log the prompt and token usage
+        try:
+            with open("logs/answer_generator_prompt.log", "a", encoding="utf-8") as logf:
+                logf.write("\n\n====================\nPROMPT SENT TO LLM\n====================\n")
+                logf.write(prompt)
+                logf.write(f"\n\n[Prompt tokens: {prompt_tokens} | Estimated cost: ${cost:.6f}]\n")
+                logf.write("\n====================\nEND PROMPT\n====================\n")
+        except Exception as e:
+            print(f"[LOGGING ERROR] Could not write prompt log: {e}")
 
         try:
             response = self.client.chat.completions.create(

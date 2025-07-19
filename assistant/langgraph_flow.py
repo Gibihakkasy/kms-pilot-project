@@ -65,20 +65,21 @@ def run_assistant(user_query, history=None):
     """
     history = history or []
     context_history, summary = _prepare_context(history)
+    # Always use the last 5 Q&A as previous Q&A
+    prev_qa_pairs = history[-MAX_HISTORY_PAIRS:] if len(history) >= MAX_HISTORY_PAIRS else history
+    prev_qa_str = "\n".join([f"User: {u}\nAssistant: {a}" for u, a in prev_qa_pairs])
+    summarized_str = summary or ""
     context_str = _build_context_string(context_history, summary)
     intent = classify_intent(user_query)
     if intent == 'summarize':
         retriever = Retriever()
         if ChatOpenAI is not None and summarize_documents is not None:
             llm = ChatOpenAI(model_name="gpt-4.1-nano", temperature=0, openai_api_key=os.getenv("OPENAI_API_KEY"))
-            # Use both user_query and context_str for retrieval
-            retrieval_query = f"{context_str}\nCurrent user request: {user_query}"
+            retrieval_query = f"{prev_qa_str}\nCurrent user request: {user_query}"
             chunks = retriever.retrieve_chunks(retrieval_query, k=5)
             if chunks:
                 docs = [Document(page_content=chunk['text'], metadata=chunk['metadata']) for chunk in chunks]
-                # Pass context as part of the prompt if possible
-                summary_prompt = f"{context_str}\nSummarize the following content based on the conversation above and the user request: {user_query}"
-                # Optionally, inject context into the first doc
+                summary_prompt = f"{prev_qa_str}\nSummarized Conversation:\n{summarized_str}\nSummarize the following content based on the conversation above and the user request: {user_query}"
                 if docs:
                     docs[0].page_content = summary_prompt + "\n" + docs[0].page_content
                 summary_text = summarize_documents(llm, docs)
@@ -97,16 +98,10 @@ def run_assistant(user_query, history=None):
     else:
         retriever = Retriever()
         answer_generator = AnswerGenerator()
-        # Use both user_query and context_str for retrieval
-        retrieval_query = f"{context_str}\nCurrent user question: {user_query}"
+        retrieval_query = f"{prev_qa_str}\nCurrent user question: {user_query}"
         chunks = retriever.retrieve_chunks(retrieval_query, k=5)
         if chunks:
-            # Pass context to the LLM by prepending to the prompt
-            context_for_llm = f"{context_str}\nUser: {user_query}"
-            # Patch: inject context into the first chunk for the LLM
-            if chunks:
-                chunks[0]['text'] = context_for_llm + "\n" + chunks[0]['text']
-            answer = answer_generator.generate_answer(user_query, chunks)
+            answer = answer_generator.generate_answer(user_query, chunks, previous_questions=prev_qa_str, summarized_history=summarized_str)
             sources = _extract_sources_from_chunks(chunks)
         else:
             answer = "I could not find relevant information to answer your question."

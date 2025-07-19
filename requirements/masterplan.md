@@ -107,6 +107,17 @@ kms_pilot/
   - If conversation exceeds 5 Q&A, summarize older turns using GPT-4.1-nano and include the summary as part of the context
   - Enable follow-up questions and long-session continuity within a session
 
+
+12. Redesign Chat UI with Gradio
+  - Use gr.ChatInterface or Blocks for chat layout
+  - Handle multi-turn state (chat history)
+  - Capture file uploads and input prompts
+  - Track token usage per query using get_openai_callback
+  - Do not invoke LangGraph here
+  - Focus: frontend flow only
+
+
+
 ### Success Criteria
 
 - Documents can be uploaded or placed in a folder
