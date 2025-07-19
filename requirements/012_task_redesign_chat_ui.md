@@ -2,7 +2,7 @@
 
 ## 1. Summary
 
-This task updates the chat interface using Gradio's `ChatInterface` or `Blocks`. It enables multi-turn interactions, displays chat history, and accepts PDF uploads. This task is purely frontend-focused and does not yet invoke LangGraph or model inference. It also introduces token usage tracking in the UI development phase to benchmark cost and performance.
+This task updates the chat interface using Gradio's `ChatInterface` or `Blocks`. It enables multi-turn interactions, displays chat history, and accepts PDF uploads. This task is purely frontend-focused and does not yet invoke LangGraph or model inference. It also introduces comprehensive token usage tracking in the UI development phase to benchmark cost and performance.
 
 ## 2. Project Setup
 
@@ -17,6 +17,7 @@ To be added in `requirements.txt`:
 gradio
 langchain
 openai
+tiktoken
 ```
 
 ## 3. Implementation
@@ -31,10 +32,17 @@ openai
    - Store uploaded files in `/documents/`
    - Do not invoke LangGraph or summarization yet
 
-3. **Token Usage Monitoring**
-   - Use `langchain.callbacks.get_openai_callback()`
-   - Print tokens and cost per user query
-   - persist token log to a logs file alongside the prompt
+3. **Comprehensive Token Usage Monitoring**
+   - Use `tiktoken` for accurate token counting across all LLM activities
+   - Implement model-specific pricing (GPT-4, GPT-3.5-turbo, etc.) for accurate cost estimation
+   - Track both input and output tokens for all LLM calls
+   - Log token usage and costs for:
+     - Document embedding (text-embedding-3-large)
+     - Answer generation (GPT models)
+     - Document summarization (refine chain)
+     - Chat history summarization (for long conversations)
+   - Persist comprehensive token logs to `logs/token_usage.log` with timestamps and activity types
+   - Include model name, input/output tokens, and estimated cost per activity
 
 4. **Frontend Polish**
    - Display messages in markdown
@@ -52,6 +60,6 @@ openai
 
 - Confirm multi-turn chat renders correctly
 - Upload PDF and confirm file appears in `/documents/`
-- Log printed token usage per mock query
+- Log printed token usage per mock query with accurate pricing
 - Confirm interface does not crash on invalid input
 - Validate UI layout is production-ready

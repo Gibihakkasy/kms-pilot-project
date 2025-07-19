@@ -4,12 +4,12 @@ from typing import List, Dict, Any
 
 from dotenv import load_dotenv
 from openai import OpenAI
-import tiktoken
 
 # Add the project root to the Python path to allow for package-like imports
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from qa.retriever import Retriever
+from utils.token_logger import token_logger
 
 load_dotenv()
 
@@ -53,22 +53,11 @@ class AnswerGenerator:
         prompt_sections.append(f"User Question:\n{query}")
         prompt = "\n\n====\n\n".join(prompt_sections) + "\n\nAnswer:"
 
-        # Token counting
-        try:
-            encoding = tiktoken.encoding_for_model(self.model)
-        except Exception:
-            encoding = tiktoken.get_encoding("cl100k_base")
-        prompt_tokens = len(encoding.encode(prompt))
-        # Estimate cost (for GPT-4.1-nano, adjust as needed)
-        # Example: $10.00 / 1M tokens (input)
-        cost_per_1k = 0.01  # $0.01 per 1K tokens (adjust to your model pricing)
-        cost = (prompt_tokens / 1000) * cost_per_1k
-        # Log the prompt and token usage
+        # Log the prompt
         try:
             with open("logs/answer_generator_prompt.log", "a", encoding="utf-8") as logf:
                 logf.write("\n\n====================\nPROMPT SENT TO LLM\n====================\n")
                 logf.write(prompt)
-                logf.write(f"\n\n[Prompt tokens: {prompt_tokens} | Estimated cost: ${cost:.6f}]\n")
                 logf.write("\n====================\nEND PROMPT\n====================\n")
         except Exception as e:
             print(f"[LOGGING ERROR] Could not write prompt log: {e}")
@@ -83,7 +72,12 @@ class AnswerGenerator:
                 temperature=0.2,  # Lower temperature for more factual answers
             )
             content = response.choices[0].message.content
-            return content.strip() if content else "The model did not return a valid answer." 
+            answer = content.strip() if content else "The model did not return a valid answer."
+            
+            # Log token usage using the comprehensive token logger
+            token_logger.log_answer_generation(prompt, answer, self.model, query)
+            
+            return answer
         except Exception as e:
             print(f"An error occurred while generating the answer: {e}")
             return "I encountered an error while trying to generate an answer. Please try again."

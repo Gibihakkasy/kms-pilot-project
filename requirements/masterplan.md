@@ -112,7 +112,10 @@ kms_pilot/
   - Use gr.ChatInterface or Blocks for chat layout
   - Handle multi-turn state (chat history)
   - Capture file uploads and input prompts
-  - Track token usage per query using get_openai_callback
+  - Implement comprehensive token usage monitoring using tiktoken
+  - Track input/output tokens and costs for all LLM activities (embedding, answer generation, summarization)
+  - Use model-specific pricing for accurate cost estimation
+  - Log all token usage to logs/token_usage.log with timestamps and activity types
   - Do not invoke LangGraph here
   - Focus: frontend flow only
 

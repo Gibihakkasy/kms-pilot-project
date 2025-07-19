@@ -3,6 +3,19 @@ from langchain.schema import Document
 from langchain.chains.summarize import load_summarize_chain
 from langchain.chat_models import ChatOpenAI
 from langchain.prompts import PromptTemplate
+import sys
+import os
+
+# Add project root to the Python path
+sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+
+# Try to import token_logger, but don't fail if it's not available
+try:
+    from utils.token_logger import token_logger
+    TOKEN_LOGGING_AVAILABLE = True
+except ImportError:
+    TOKEN_LOGGING_AVAILABLE = False
+    print("[WARNING] Token logging not available")
 
 def summarize_documents(llm: ChatOpenAI, documents: List[Document]) -> str:
     """
@@ -73,7 +86,17 @@ def summarize_documents(llm: ChatOpenAI, documents: List[Document]) -> str:
         
         # Run the chain on this batch
         result = chain({"input_documents": batch}, return_only_outputs=True)
-        all_summaries.append(result["output_text"])
+        batch_summary = result["output_text"]
+        all_summaries.append(batch_summary)
+        
+        # Log summarization token usage for this batch
+        if TOKEN_LOGGING_AVAILABLE:
+            try:
+                batch_text = "\n".join([doc.page_content for doc in batch])
+                model_name = getattr(llm, 'model_name', 'gpt-4.1-nano') or 'gpt-4.1-nano'
+                token_logger.log_summarization(batch_text, batch_summary, model_name, "document_batch")
+            except Exception as e:
+                print(f"[TOKEN LOGGING ERROR] Could not log summarization: {e}")
         
         print(f"Completed batch {i//batch_size + 1}/{total_batches}")
     
@@ -88,7 +111,6 @@ def summarize_documents(llm: ChatOpenAI, documents: List[Document]) -> str:
 if __name__ == "__main__":
     # Example usage
     from langchain.document_loaders import PyPDFLoader
-    import os
     
     # Initialize the LLM
     llm = ChatOpenAI(

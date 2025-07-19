@@ -15,6 +15,7 @@ project_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.append(project_root)
 
 from ingest.pdf_loader import load_and_chunk_pdfs
+from utils.token_logger import token_logger
 
 # --- Configuration ---
 EMBEDDING_MODEL = "text-embedding-3-large"
@@ -75,6 +76,9 @@ def embed_chunks(chunks):
     try:
         for i, batch in enumerate(batches):
             print(f"Requesting embeddings for batch {i+1}/{len(batches)} (batch size: {len(batch)})...")
+            # Log embedding token usage for this batch
+            batch_text = "\n".join(batch)
+            token_logger.log_embedding(batch_text, EMBEDDING_MODEL, f"batch_{i+1}")
             response = client.embeddings.create(input=batch, model=EMBEDDING_MODEL)
             all_embeddings.extend([item.embedding for item in response.data])
         return np.array(all_embeddings, dtype='float32')

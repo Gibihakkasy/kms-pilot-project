@@ -4,6 +4,7 @@ from qa.retriever import Retriever
 from chains.summarization_refine_chain import summarize_documents
 from langchain.chat_models import ChatOpenAI
 from langchain.schema import Document
+from utils.token_logger import token_logger
 import os
 
 MAX_HISTORY_PAIRS = 5
@@ -32,6 +33,8 @@ def _prepare_context(history):
             prompt = f"Summarize the following conversation between a user and an assistant. Focus on the key topics, questions, and answers discussed so far.\n\n{chat_text}\n\nSummary:"
             response = llm.invoke(prompt)
             summary = response.content.strip() if hasattr(response, 'content') else str(response)
+            # Log chat summarization token usage
+            token_logger.log_chat_summarization(chat_text, summary, "gpt-4.1-nano")
         except Exception as e:
             summary = "[Summary unavailable due to error]"
     return recent, summary
