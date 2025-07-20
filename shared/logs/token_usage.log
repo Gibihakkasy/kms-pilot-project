@@ -1,0 +1,48 @@
+[2025-07-19 12:57:24] ANSWER_GENERATION
+Model: gpt-4.1-nano
+Input tokens: 3,148
+Output tokens: 354
+Total tokens: 3,502
+Estimated cost: $0.000386
+Query: apa tugas komite ai
+--------------------------------------------------
+[2025-07-19 18:09:25] ANSWER_GENERATION
+Model: gpt-4.1-nano
+Input tokens: 1,518
+Output tokens: 263
+Total tokens: 1,781
+Estimated cost: $0.000204
+Query: what specific staff certification required
+--------------------------------------------------
+[2025-07-19 18:10:00] ANSWER_GENERATION
+Model: gpt-4.1-nano
+Input tokens: 3,982
+Output tokens: 534
+Total tokens: 4,516
+Estimated cost: $0.000505
+Query: apakah boleh yang tidak punya sertifikat untuk mengimplementasi AI
+--------------------------------------------------
+[2025-07-19 19:06:20] ANSWER_GENERATION
+Model: gpt-4.1-nano
+Input tokens: 3,057
+Output tokens: 243
+Total tokens: 3,300
+Estimated cost: $0.000354
+Query: kemana dan kapan laporan mengenai AI
+--------------------------------------------------
+[2025-07-19 19:08:18] ANSWER_GENERATION
+Model: gpt-4.1-nano
+Input tokens: 3,059
+Output tokens: 434
+Total tokens: 3,493
+Estimated cost: $0.000393
+Query: ada regulasi ai di customer service?
+--------------------------------------------------
+[2025-07-19 19:08:45] ANSWER_GENERATION
+Model: gpt-4.1-nano
+Input tokens: 3,490
+Output tokens: 155
+Total tokens: 3,645
+Estimated cost: $0.000380
+Query: apa maksud cadangan di no 4
+--------------------------------------------------

@@ -1,7 +1,9 @@
 pymupdf
 faiss-cpu
 openai
-gradio
+fastapi
+uvicorn[standard]
+python-multipart
 langdetect
 tiktoken
 langgraph
