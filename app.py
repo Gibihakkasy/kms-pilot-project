@@ -3,7 +3,6 @@
 Unified entry point for the Knowledge Management System.
 Starts both the FastAPI backend and Next.js frontend.
 """
-import os
 import sys
 import subprocess
 import time

@@ -3,7 +3,7 @@ import json
 import numpy as np
 import faiss
 from openai import OpenAI
-from typing import List, Dict, Any, Optional
+from typing import Optional
 from dotenv import load_dotenv
 
 # Load environment variables
@@ -74,31 +74,3 @@ class Retriever:
                         chunk_data['retrieval_score'] = float(distances[0][i])
                         results.append(chunk_data)
         return results
-
-if __name__ == '__main__':
-    retriever = Retriever()
-    if retriever.index:
-        test_queries = [
-            # Indonesian queries
-            "Apa saja prinsip dasar AI yang bertanggung jawab menurut OJK?",
-            "Langkah-langkah ketahanan terhadap gangguan digital dalam Panduan Resiliensi Digital?",
-            "Bagaimana OJK mengatur pemanfaatan AI di sektor fintech?",
-            # English query for multilingual check
-            "What are the ethical principles for AI in finance?",
-            # Edge cases
-            "",  # Empty query
-            "What is the weather in Paris?",  # Low-relevance query
-            "Sebutkan prinsip AI menurut OJK."  # Similar but differently worded
-        ]
-        for test_query in test_queries:
-            print(f"\nSearching for: '{test_query}'")
-            retrieved_chunks = retriever.retrieve_chunks(test_query, k=3)
-            if retrieved_chunks:
-                print("\n--- Top 3 Retrieved Chunks ---")
-                for i, chunk in enumerate(retrieved_chunks, 1):
-                    print(f"{i}. File: {chunk['metadata']['file_name']}, Page: {chunk['metadata']['page_number']}")
-                    print(f"   Score: {chunk['retrieval_score']:.4f}")
-                    print(f"   Text: {chunk['text'][:150]}...")
-                print("----------------------------\n")
-            else:
-                print("No relevant chunks found.")

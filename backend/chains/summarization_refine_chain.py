@@ -107,26 +107,3 @@ def summarize_documents(llm: ChatOpenAI, documents: List[Document]) -> str:
         return combined_summary
     
     return all_summaries[0] if all_summaries else ""
-
-if __name__ == "__main__":
-    # Example usage
-    from langchain.document_loaders import PyPDFLoader
-    
-    # Initialize the LLM
-    llm = ChatOpenAI(
-        model_name="gpt-4.1-nano",  # or "gpt-3.5-turbo" if preferred
-        temperature=0,
-        openai_api_key=os.getenv("OPENAI_API_KEY")
-    )
-    
-    # Load a sample document
-    pdf_path = input("Enter the path to the PDF file: ")
-    loader = PyPDFLoader(pdf_path)
-    docs = loader.load()
-    
-    # Generate and print the summary
-    summary = summarize_documents(llm, docs)
-    print("\n" + "="*80)
-    print("SUMMARY:")
-    print("="*80)
-    print(summary)

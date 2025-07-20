@@ -8,7 +8,6 @@ from openai import OpenAI
 # Add the project root to the Python path to allow for package-like imports
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-from qa.retriever import Retriever
 from utils.token_logger import token_logger
 
 load_dotenv()
@@ -45,17 +44,19 @@ class AnswerGenerator:
         prompt_sections = []
         previous_questions = previous_questions or ""
         summarized_history = summarized_history or ""
-        if summarized_history:
-            prompt_sections.append(f"Summarized Conversation:\n{summarized_history}")
-        if previous_questions:
+        
+        # Always include summary and previous Q&A if present
+        if summarized_history and summarized_history.strip():
+            prompt_sections.append(f"Previous conversation summary:\n{summarized_history}")
+        if previous_questions and previous_questions.strip():
             prompt_sections.append(f"Previous Q&A:\n{previous_questions}")
-        prompt_sections.append(f"Vector Search Result:\n{context}")
-        prompt_sections.append(f"User Question:\n{query}")
+        prompt_sections.append(f"Relevant context from documents:\n{context}")
+        prompt_sections.append(f"Current user question:\n{query}")
         prompt = "\n\n====\n\n".join(prompt_sections) + "\n\nAnswer:"
 
         # Log the prompt
         try:
-            with open("logs/answer_generator_prompt.log", "a", encoding="utf-8") as logf:
+            with open("shared/logs/answer_generator_prompt.log", "a", encoding="utf-8") as logf:
                 logf.write("\n\n====================\nPROMPT SENT TO LLM\n====================\n")
                 logf.write(prompt)
                 logf.write("\n====================\nEND PROMPT\n====================\n")
@@ -66,7 +67,14 @@ class AnswerGenerator:
             response = self.client.chat.completions.create(
                 model=self.model,
                 messages=[
-                    {"role": "system", "content": "You are a helpful assistant."},
+                    {"role": "system", "content": 
+                        "You are a helpful assistant for a banking regulation knowledge management system." + "\n"
+                        "Answer the user's question based *only* on the provided context below." + "\n"
+                        "Answer the user's question based *only* on what applies in Indonesia." + "\n"
+                        "If the context does not contain the answer, state that you cannot answer the question with the given information and ask for the user for clarification." + "\n"
+                        "Provide the answer in the same language as the user's question, if not sure what language default back to English." + "\n"
+                        "Format the answer for readability, e.g. use bullet points, numbered lists, etc." + "\n"
+                    },
                     {"role": "user", "content": prompt}
                 ],
                 temperature=0.2,  # Lower temperature for more factual answers
@@ -81,48 +89,3 @@ class AnswerGenerator:
         except Exception as e:
             print(f"An error occurred while generating the answer: {e}")
             return "I encountered an error while trying to generate an answer. Please try again."
-
-if __name__ == '__main__':
-    # This demonstrates the full pipeline: retrieve and then generate an answer
-    retriever = Retriever()
-    answer_generator = AnswerGenerator()
-
-    # --- Test Case 1: Indonesian Query ---
-    test_query_id = "Apa saja prinsip dasar AI yang bertanggung jawab menurut OJK?"
-    print(f"\n--- Testing Query: '{test_query_id}' ---")
-    
-    retrieved_chunks_id = retriever.retrieve_chunks(test_query_id, k=3)
-    
-    if retrieved_chunks_id:
-        print(f"Retrieved {len(retrieved_chunks_id)} chunks.")
-        final_answer_id = answer_generator.generate_answer(test_query_id, retrieved_chunks_id)
-        
-        print("\n--- Generated Answer ---")
-        print(final_answer_id)
-        
-        print("\n--- Sources ---")
-        for i, chunk in enumerate(retrieved_chunks_id, 1):
-            print(f"{i}. {chunk['metadata']['file_name']} (Page {chunk['metadata']['page_number']})")
-        print("------------------------\n")
-    else:
-        print("No chunks were retrieved for this query.")
-
-    # --- Test Case 2: English Query ---
-    test_query_en = "What are the steps for digital resilience?"
-    print(f"\n--- Testing Query: '{test_query_en}' ---")
-
-    retrieved_chunks_en = retriever.retrieve_chunks(test_query_en, k=3)
-
-    if retrieved_chunks_en:
-        print(f"Retrieved {len(retrieved_chunks_en)} chunks.")
-        final_answer_en = answer_generator.generate_answer(test_query_en, retrieved_chunks_en)
-
-        print("\n--- Generated Answer ---")
-        print(final_answer_en)
-
-        print("\n--- Sources ---")
-        for i, chunk in enumerate(retrieved_chunks_en, 1):
-            print(f"{i}. {chunk['metadata']['file_name']} (Page {chunk['metadata']['page_number']})")
-        print("------------------------\n")
-    else:
-        print("No chunks were retrieved for this query.")

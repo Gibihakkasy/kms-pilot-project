@@ -53,28 +53,3 @@ class DocumentMonitor:
         self.observer.stop()
         self.observer.join()
         logging.info("Stopped monitoring directory.")
-
-if __name__ == '__main__':
-    # Example usage:
-    # This part is for testing the monitor independently.
-    import sys
-    project_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-    sys.path.append(project_root)
-    
-    from embeddings.vector_store import create_and_save_vector_store
-
-    DOCUMENTS_DIR = os.path.join(project_root, 'documents')
-    
-    print(f"Watching directory: {DOCUMENTS_DIR}")
-    print("Add or modify a PDF file in the directory to test. Press Ctrl+C to stop.")
-
-    # Create and start the monitor
-    monitor = DocumentMonitor(path=DOCUMENTS_DIR, callback=create_and_save_vector_store)
-    monitor.start()
-
-    try:
-        while True:
-            time.sleep(1)
-    except KeyboardInterrupt:
-        monitor.stop()
-        print("\nMonitoring stopped.")

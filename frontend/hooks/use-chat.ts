@@ -24,7 +24,6 @@ export function useChat() {
   const sendMessage = async (content: string) => {
     if (!content.trim()) return;
 
-    // Add user message
     const userMessage: Message = {
       id: Date.now(),
       type: 'user',
@@ -37,8 +36,8 @@ export function useChat() {
     setError(null);
 
     try {
-      // Prepare conversation history for API
-      const conversationHistory = messages.map(msg => ({
+      // FIX: Include the new user message in the conversation history
+      const conversationHistory = [...messages, userMessage].map(msg => ({
         type: msg.type,
         content: msg.content,
         source: msg.source,

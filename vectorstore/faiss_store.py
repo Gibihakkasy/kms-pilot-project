@@ -3,7 +3,7 @@ FAISS vector store creation with plug-and-play embedding backend (HuggingFace or
 """
 import os
 import json
-from typing import List, Literal
+from typing import Literal
 from langchain.vectorstores import FAISS
 from langchain.embeddings import HuggingFaceEmbeddings, OpenAIEmbeddings
 from ingest.pdf_ingester import load_and_chunk_pdfs_langchain

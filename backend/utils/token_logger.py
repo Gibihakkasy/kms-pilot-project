@@ -17,7 +17,7 @@ class TokenLogger:
         "text-embedding-3-large": {"input": 0.00013, "output": 0.0}, # $0.13 / 1M tokens (embedding only)
     }
     
-    def __init__(self, log_file: str = "logs/token_usage.log"):
+    def __init__(self, log_file: str = "shared/logs/token_usage.log"):
         """Initialize the token logger."""
         self.log_file = log_file
         os.makedirs(os.path.dirname(log_file), exist_ok=True)

@@ -46,3 +46,162 @@ Total tokens: 3,645
 Estimated cost: $0.000380
 Query: apa maksud cadangan di no 4
 --------------------------------------------------
+[2025-07-20 22:01:24] ANSWER_GENERATION
+Model: gpt-4.1-nano
+Input tokens: 3,192
+Output tokens: 390
+Total tokens: 3,582
+Estimated cost: $0.000397
+Query: apa kompetensi yang diperlukan komite ai di bank
+--------------------------------------------------
+[2025-07-20 22:01:54] ANSWER_GENERATION
+Model: gpt-4.1-nano
+Input tokens: 1,721
+Output tokens: 282
+Total tokens: 2,003
+Estimated cost: $0.000228
+Query: jelaskan lebih lanjut poin 5
+--------------------------------------------------
+[2025-07-20 22:19:36] ANSWER_GENERATION
+Model: gpt-4.1-nano
+Input tokens: 3,341
+Output tokens: 170
+Total tokens: 3,511
+Estimated cost: $0.000368
+Query: Apa itu AI?
+--------------------------------------------------
+[2025-07-20 22:23:09] ANSWER_GENERATION
+Model: gpt-4.1-nano
+Input tokens: 2,482
+Output tokens: 522
+Total tokens: 3,004
+Estimated cost: $0.000353
+Query: apa peraturan
+--------------------------------------------------
+[2025-07-20 22:23:22] ANSWER_GENERATION
+Model: gpt-4.1-nano
+Input tokens: 1,764
+Output tokens: 245
+Total tokens: 2,009
+Estimated cost: $0.000225
+Query: apa maksud nomor 4
+--------------------------------------------------
+[2025-07-20 22:32:10] ANSWER_GENERATION
+Model: gpt-4.1-nano
+Input tokens: 3,067
+Output tokens: 601
+Total tokens: 3,668
+Estimated cost: $0.000427
+Query: apa ketentuan implementasi AI
+--------------------------------------------------
+[2025-07-20 22:32:15] ANSWER_GENERATION
+Model: gpt-4.1-nano
+Input tokens: 2,305
+Output tokens: 298
+Total tokens: 2,603
+Estimated cost: $0.000290
+Query: jelaskan regulasi poin 2
+--------------------------------------------------
+[2025-07-20 22:41:07] ANSWER_GENERATION
+Model: gpt-4.1-nano
+Input tokens: 3,070
+Output tokens: 579
+Total tokens: 3,649
+Estimated cost: $0.000423
+Query: apa ketentuan implementasi AI
+--------------------------------------------------
+[2025-07-20 22:41:39] ANSWER_GENERATION
+Model: gpt-4.1-nano
+Input tokens: 1,946
+Output tokens: 739
+Total tokens: 2,685
+Estimated cost: $0.000342
+Query: jelaskan lebih lanjut regulasi untuk no 3
+--------------------------------------------------
+[2025-07-20 22:46:15] ANSWER_GENERATION
+Model: gpt-4.1-nano
+Input tokens: 2,894
+Output tokens: 352
+Total tokens: 3,246
+Estimated cost: $0.000360
+Query: apa saja kompetensi anggota komite ai
+--------------------------------------------------
+[2025-07-20 22:46:45] ANSWER_GENERATION
+Model: gpt-4.1-nano
+Input tokens: 1,657
+Output tokens: 404
+Total tokens: 2,061
+Estimated cost: $0.000247
+Query: apa regulasi mengenai poin 5
+--------------------------------------------------
+[2025-07-20 22:50:39] ANSWER_GENERATION
+Model: gpt-4.1-nano
+Input tokens: 3,223
+Output tokens: 585
+Total tokens: 3,808
+Estimated cost: $0.000439
+Query: apa ketentuan implementasi ai di bank
+--------------------------------------------------
+[2025-07-20 22:51:09] ANSWER_GENERATION
+Model: gpt-4.1-nano
+Input tokens: 4,106
+Output tokens: 788
+Total tokens: 4,894
+Estimated cost: $0.000568
+Query: jelaskan lebih lanjut regulasi mengenai poin 2
+--------------------------------------------------
+[2025-07-20 23:12:18] ANSWER_GENERATION
+Model: gpt-4.1-nano
+Input tokens: 1,977
+Output tokens: 72
+Total tokens: 2,049
+Estimated cost: $0.000212
+Query: apa peraturan no 3
+--------------------------------------------------
+[2025-07-20 23:12:38] ANSWER_GENERATION
+Model: gpt-4.1-nano
+Input tokens: 3,100
+Output tokens: 621
+Total tokens: 3,721
+Estimated cost: $0.000434
+Query: apa regulasi ai di bank
+--------------------------------------------------
+[2025-07-20 23:15:19] ANSWER_GENERATION
+Model: gpt-4.1-nano
+Input tokens: 3,582
+Output tokens: 238
+Total tokens: 3,820
+Estimated cost: $0.000406
+Query: apa maksud dari no 7
+--------------------------------------------------
+[2025-07-20 23:16:00] ANSWER_GENERATION
+Model: gpt-4.1-nano
+Input tokens: 3,528
+Output tokens: 244
+Total tokens: 3,772
+Estimated cost: $0.000402
+Query: apakah peraturan untuk poin 3
+--------------------------------------------------
+[2025-07-20 23:18:38] ANSWER_GENERATION
+Model: gpt-4.1-nano
+Input tokens: 4,397
+Output tokens: 200
+Total tokens: 4,597
+Estimated cost: $0.000480
+Query: bagaimana no 6
+--------------------------------------------------
+[2025-07-20 23:19:31] CHAT_SUMMARIZATION
+Model: gpt-4.1-nano
+Input tokens: 83
+Output tokens: 38
+Total tokens: 121
+Estimated cost: $0.000016
+--------------------------------------------------
+[2025-07-20 23:19:35] ANSWER_GENERATION
+Model: gpt-4.1-nano
+Input tokens: 4,923
+Output tokens: 373
+Total tokens: 5,296
+Estimated cost: $0.000567
+Query: jelaskan lebih lanjut poin 8
+--------------------------------------------------

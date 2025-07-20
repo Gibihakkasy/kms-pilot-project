@@ -1,12 +1,9 @@
 from fastapi import FastAPI, HTTPException, UploadFile, File
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
 import os
 import glob
-import threading
 import atexit
-import json
 from typing import List, Dict, Optional
 from datetime import datetime
 import shutil
@@ -18,9 +15,9 @@ from backend.embeddings.vector_store import create_and_save_vector_store
 
 # --- CONFIGURATION & INITIALIZATION ---
 DOCUMENTS_DIR = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), 'shared', 'documents')
-LOGS_DIR = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), 'shared', 'logs')
+# LOGS_DIR = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), 'shared', 'logs')
 os.makedirs(DOCUMENTS_DIR, exist_ok=True)
-os.makedirs(LOGS_DIR, exist_ok=True)
+# os.makedirs(LOGS_DIR, exist_ok=True)
 
 # Initialize FastAPI app
 app = FastAPI(title="Knowledge Assistant API", version="1.0.0")
@@ -112,20 +109,26 @@ async def upload_document(file: UploadFile = File(...)):
 async def chat(message: ChatMessage):
     """Process chat message and return assistant response"""
     try:
-        # Convert conversation history from frontend format to assistant format
-        # Frontend format: [{"role": "user", "content": "..."}, {"role": "assistant", "content": "..."}]
-        # Assistant format: [("user_message", "assistant_message"), ...]
+        # Robustly convert conversation history from frontend format to assistant format
         history = []
-        if message.conversation_history:
-            # Group messages into user-assistant pairs
-            for i in range(0, len(message.conversation_history) - 1, 2):
-                if (i + 1 < len(message.conversation_history) and 
-                    message.conversation_history[i].get("role") == "user" and
-                    message.conversation_history[i + 1].get("role") == "assistant"):
-                    user_msg = message.conversation_history[i]["content"]
-                    assistant_msg = message.conversation_history[i + 1]["content"]
-                    history.append((user_msg, assistant_msg))
-        
+        msgs = message.conversation_history or []
+        # Skip initial assistant-only message (welcome)
+        if msgs and msgs[0].get("type") == "assistant" and len(msgs) > 1:
+            msgs = msgs[1:]
+        # Only include up to the last complete user-assistant pair (exclude current user question if unpaired)
+        last_index = len(msgs)
+        if last_index > 0 and msgs[-1].get("type") == "user":
+            last_index -= 1
+        i = 0
+        while i < last_index:
+            if msgs[i].get("type") == "user":
+                user_msg = msgs[i]["content"]
+                assistant_msg = ""
+                if i + 1 < last_index and msgs[i + 1].get("type") == "assistant":
+                    assistant_msg = msgs[i + 1]["content"]
+                    i += 1
+                history.append((user_msg, assistant_msg))
+            i += 1
         # Run the assistant with the user's message and conversation history
         response = run_assistant(message.content, history)
         
@@ -199,7 +202,7 @@ if __name__ == "__main__":
     import uvicorn
     print("🚀 Starting Knowledge Assistant API...")
     print(f"📁 Documents directory: {DOCUMENTS_DIR}")
-    print(f"📝 Logs directory: {LOGS_DIR}")
+    # print(f"📝 Logs directory: {LOGS_DIR}") # This line is removed as per the edit hint
     print("🌐 API will be available at: http://localhost:8000")
     print("📚 API docs will be available at: http://localhost:8000/docs")
     

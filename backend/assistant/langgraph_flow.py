@@ -35,7 +35,7 @@ def _prepare_context(history):
             summary = response.content.strip() if hasattr(response, 'content') else str(response)
             # Log chat summarization token usage
             token_logger.log_chat_summarization(chat_text, summary, "gpt-4.1-nano")
-        except Exception as e:
+        except Exception:
             summary = "[Summary unavailable due to error]"
     return recent, summary
 
@@ -72,7 +72,6 @@ def run_assistant(user_query, history=None):
     prev_qa_pairs = history[-MAX_HISTORY_PAIRS:] if len(history) >= MAX_HISTORY_PAIRS else history
     prev_qa_str = "\n".join([f"User: {u}\nAssistant: {a}" for u, a in prev_qa_pairs])
     summarized_str = summary or ""
-    context_str = _build_context_string(context_history, summary)
     intent = classify_intent(user_query)
     if intent == 'summarize':
         retriever = Retriever()
